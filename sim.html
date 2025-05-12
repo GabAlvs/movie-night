@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convite Especial</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        #video-background {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+            object-fit: cover;
+        }
+        
+        .convite-container {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 50px auto;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 1s ease;
+        }
+        
+        .convite-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 1s ease;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            transition: all 1s ease;
+        }
+        
+        .audio-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .mensagem-final {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: 0;
+            transition: all 1s ease;
+            z-index: 5;
+            width: 80%;
+            max-width: 600px;
+            pointer-events: none;
+        }
+        
+        .mensagem-final h2 {
+            font-size: 32px;
+            margin-bottom: 30px;
+        }
+        
+        .gif-container {
+            margin-top: 20px;
+        }
+        
+        .gif-container img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-20px);
+        }
+        
+        .visible {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            flex-direction: column;
+        }
+        
+        .overlay button {
+            background: #bf2727;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="overlay" id="overlay">
+        <h2>Clique para ver</h2>
+        <button id="startButton">Descobrir</button>
+    </div>
+
+    <video autoplay muted loop id="video-background">
+        <source src="./Assets/bg.mp4" type="video/mp4">
+    </video>
+    
+    <audio id="background-audio" loop>
+        <source src="./Assets/George Michael - Careless Whisper (Official Video).mp3" type="audio/mpeg">
+    </audio>
+    
+    <button class="audio-control" id="audio-control">
+        <i class="fas fa-volume-up"></i>
+    </button>
+
+    <div class="convite-container" id="convite">
+        <img src="./Assets/Rabech.png" alt="Convite" class="convite-img" id="conviteImg">
+    </div>
+
+    <div class="mensagem-final" id="mensagemFinal">
+        <h2>Te espero em breve!</h2>
+        <div class="gif-container">
+            <img src="./Assets/sexy.gif" alt="Animação sexy">
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('background-audio');
+        const audioControl = document.getElementById('audio-control');
+        const convite = document.getElementById('convite');
+        const mensagemFinal = document.getElementById('mensagemFinal');
+        const overlay = document.getElementById('overlay');
+        const startButton = document.getElementById('startButton');
+        
+        // Variável para controlar o timeout da transição
+        let transitionTimeout;
+        
+        // Função para iniciar a experiência
+        function startExperience() {
+            // Esconde o overlay
+            overlay.style.display = 'none';
+            
+            // Tenta iniciar o áudio
+            audio.play().then(() => {
+                console.log("Áudio iniciado com sucesso");
+            }).catch(error => {
+                console.log("Falha ao iniciar áudio automaticamente:", error);
+                // Mostra o controle de áudio se falhar
+                audioControl.style.display = 'flex';
+            });
+            
+            // Inicia a transição após 15 segundos
+            transitionTimeout = setTimeout(() => {
+                convite.classList.add('hidden');
+                setTimeout(() => {
+                    mensagemFinal.classList.add('visible');
+                }, 1000);
+            }, 10000); // 15 segundos
+        }
+        
+        // Inicia quando o usuário clicar no botão
+        startButton.addEventListener('click', startExperience);
+        
+        // Controle de áudio
+        audioControl.addEventListener('click', function() {
+            if (audio.paused) {
+                audio.play();
+                this.innerHTML = '<i class="fas fa-volume-up"></i>';
+            } else {
+                audio.pause();
+                this.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            }
+        });
+        
+        // Configura o áudio para tentar autoplay
+        document.addEventListener('DOMContentLoaded', () => {
+            audio.muted = false;
+            audio.play().then(() => {
+                overlay.style.display = 'none';
+                startExperience(); // Inicia a experiência se o autoplay funcionar
+            }).catch(() => {
+                // Mostra o overlay se o autoplay falhar
+                overlay.style.display = 'flex';
+            });
+        });
+    </script>
+</body>
+</html>
